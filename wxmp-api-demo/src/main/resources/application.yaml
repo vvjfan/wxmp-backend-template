@@ -1,0 +1,50 @@
+spring:
+  application:
+    name: wxmp-api-demo
+  datasource:
+    url: jdbc:h2:mem:wxmp;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+server:
+  port: 8080
+
+wx:
+  miniapp:
+    app-id: ${WX_MINIAPP_APP_ID:your-app-id}
+    app-secret: ${WX_MINIAPP_APP_SECRET:your-app-secret}
+    code2session-url: https://api.weixin.qq.com/sns/jscode2session
+  pay:
+    app-id: ${WX_PAY_APP_ID:your-app-id}
+    mch-id: ${WX_PAY_MCH_ID:your-mch-id}
+    api-v3-key: ${WX_PAY_API_V3_KEY:your-api-v3-key}
+    private-key-path: ${WX_PAY_PRIVATE_KEY_PATH:/path/to/apiclient_key.pem}
+    merchant-serial-number: ${WX_PAY_MERCHANT_SERIAL_NUMBER:your-merchant-serial-number}
+    notify-url: https://your-domain.com/api/payment/notify
+
+jwt:
+  secret: ${JWT_SECRET:your-256-bit-secret-key-here-must-be-at-least-32-chars}
+  access-token-expiration: 1800000
+  refresh-token-expiration: 604800000
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
