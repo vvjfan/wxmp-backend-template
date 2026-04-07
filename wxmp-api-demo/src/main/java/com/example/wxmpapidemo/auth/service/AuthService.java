@@ -11,6 +11,7 @@ import com.example.wxmpapidemo.user.entity.User;
 import com.example.wxmpapidemo.user.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -127,7 +128,7 @@ public class AuthService {
         return restClient.get()
                 .uri(url)
                 .retrieve()
-                .body(Map.class);
+                .body(new ParameterizedTypeReference<>() {});
     }
 
     private String getPhoneNumber(String code, String openid, String sessionKey) {

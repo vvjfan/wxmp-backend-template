@@ -11,6 +11,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
@@ -95,7 +96,7 @@ public class SubscribeMessageService {
                     .header("Content-Type", "application/json")
                     .body(body)
                     .retrieve()
-                    .body(Map.class);
+                    .body(new ParameterizedTypeReference<>() {});
 
             if (response == null) {
                 message.setStatus("FAILED");
@@ -175,7 +176,7 @@ public class SubscribeMessageService {
                     .header("Content-Type", "application/json")
                     .body(body)
                     .retrieve()
-                    .body(Map.class);
+                    .body(new ParameterizedTypeReference<>() {});
 
             if (response == null) {
                 message.setStatus("FAILED");

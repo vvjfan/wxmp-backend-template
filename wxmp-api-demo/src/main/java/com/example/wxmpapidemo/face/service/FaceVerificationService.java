@@ -12,6 +12,7 @@ import com.example.wxmpapidemo.user.entity.User;
 import com.example.wxmpapidemo.user.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -89,7 +90,7 @@ public class FaceVerificationService {
                 .header("Content-Type", "application/json")
                 .body(body)
                 .retrieve()
-                .body(Map.class);
+                .body(new ParameterizedTypeReference<>() {});
 
         if (response == null) {
             record.setStatus("FAILED");
@@ -148,7 +149,7 @@ public class FaceVerificationService {
                 .header("Content-Type", "application/json")
                 .body(body)
                 .retrieve()
-                .body(Map.class);
+                .body(new ParameterizedTypeReference<>() {});
 
         if (response == null) {
             throw new WxApiException(500, "查询核身结果失败：微信返回空响应");

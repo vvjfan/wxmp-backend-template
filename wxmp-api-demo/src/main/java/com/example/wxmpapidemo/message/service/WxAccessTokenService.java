@@ -3,6 +3,7 @@ package com.example.wxmpapidemo.message.service;
 import com.example.wxmpapidemo.config.WxConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
@@ -56,7 +57,7 @@ public class WxAccessTokenService {
                 .header("Content-Type", "application/json")
                 .body(body)
                 .retrieve()
-                .body(Map.class);
+                .body(new ParameterizedTypeReference<>() {});
 
         if (response == null || !response.containsKey("access_token")) {
             String errMsg = (String) response.getOrDefault("errmsg", "unknown error");
