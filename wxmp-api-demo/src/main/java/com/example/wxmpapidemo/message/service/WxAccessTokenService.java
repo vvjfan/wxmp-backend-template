@@ -59,7 +59,11 @@ public class WxAccessTokenService {
                 .retrieve()
                 .body(new ParameterizedTypeReference<>() {});
 
-        if (response == null || !response.containsKey("access_token")) {
+        if (response == null) {
+            throw new RuntimeException("获取 access_token 失败: 响应为空");
+        }
+        
+        if (!response.containsKey("access_token")) {
             String errMsg = (String) response.getOrDefault("errmsg", "unknown error");
             throw new RuntimeException("获取 access_token 失败: " + errMsg);
         }
