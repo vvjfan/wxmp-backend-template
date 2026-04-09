@@ -100,9 +100,9 @@ public class SubscribeMessageService {
 
             if (response == null) {
                 message.setStatus("FAILED");
-                message.setErrorMsg("微信返回空响应");
+                message.setErrorMsg("微信接口无响应");
                 subscribeMessageRepository.save(message);
-                throw new WxApiException(500, "发送订阅消息失败：微信返回空响应");
+                throw new WxApiException(500, "发送订阅消息失败：微信接口无响应");
             }
 
             Number errcode = (Number) response.get("errcode");
@@ -180,9 +180,9 @@ public class SubscribeMessageService {
 
             if (response == null) {
                 message.setStatus("FAILED");
-                message.setErrorMsg("微信返回空响应");
+                message.setErrorMsg("微信接口无响应");
                 subscribeMessageRepository.save(message);
-                throw new WxApiException(500, "发送订阅消息失败：微信返回空响应");
+                throw new WxApiException(500, "发送订阅消息失败：微信接口无响应");
             }
 
             Number errcode = (Number) response.get("errcode");

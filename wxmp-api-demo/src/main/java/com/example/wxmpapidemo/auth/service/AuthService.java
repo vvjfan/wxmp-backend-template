@@ -7,6 +7,7 @@ import com.example.wxmpapidemo.auth.util.JwtUtil;
 import com.example.wxmpapidemo.common.exception.WxApiException;
 import com.example.wxmpapidemo.config.JwtConfig;
 import com.example.wxmpapidemo.config.WxConfig;
+import com.example.wxmpapidemo.message.service.WxAccessTokenService;
 import com.example.wxmpapidemo.user.entity.User;
 import com.example.wxmpapidemo.user.repository.UserRepository;
 import org.slf4j.Logger;
@@ -16,6 +17,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -26,6 +28,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final WxConfig wxConfig;
+    private final WxAccessTokenService accessTokenService;
     private final JwtConfig jwtConfig;
     private final JwtUtil jwtUtil;
     private final StringRedisTemplate redisTemplate;
@@ -33,11 +36,13 @@ public class AuthService {
 
     public AuthService(UserRepository userRepository,
                        WxConfig wxConfig,
+                       WxAccessTokenService accessTokenService,
                        JwtConfig jwtConfig,
                        JwtUtil jwtUtil,
                        StringRedisTemplate redisTemplate) {
         this.userRepository = userRepository;
         this.wxConfig = wxConfig;
+        this.accessTokenService = accessTokenService;
         this.jwtConfig = jwtConfig;
         this.jwtUtil = jwtUtil;
         this.redisTemplate = redisTemplate;
@@ -113,7 +118,7 @@ public class AuthService {
             throw new WxApiException(400, "已绑定手机号");
         }
 
-        String phoneNumber = getPhoneNumber(code, user.getOpenid(), user.getSessionKey());
+        String phoneNumber = getPhoneNumber(code);
         user.setPhoneNumber(phoneNumber);
         userRepository.save(user);
     }
@@ -131,7 +136,50 @@ public class AuthService {
                 .body(new ParameterizedTypeReference<>() {});
     }
 
-    private String getPhoneNumber(String code, String openid, String sessionKey) {
-        return "13800138000";
+    /**
+     * 获取微信手机号。<p>
+     *
+     * 响应示例：
+     * <pre>
+     * {
+     *   "errcode": 0,
+     *   "errmsg": "ok",
+     *   "phone_info": {
+     *     "phoneNumber": "xxxxxx",      // 用户绑定的手机号（国外手机号会有区号）
+     *     "purePhoneNumber": "xxxxxx",  // 没有区号的手机号
+     *     "countryCode": 86,            // 区号
+     *     "watermark": {
+     *       "timestamp": 1637744274,
+     *       "appid": "xxxx"
+     *     }
+     *   }
+     * }
+     * </pre>
+     * @param code 手机号获取凭证
+     * @return
+     */
+    private String getPhoneNumber(String code) {
+        String accessToken = accessTokenService.getAccessToken();
+        String url = "https://api.weixin.qq.com/wxa/business/getuserphonenumber?access_token=" + accessToken;
+
+        Map<String, Object> response = restClient.post()
+                .uri(url)
+                .header("Content-Type", "application/json")
+                .body(Map.of("code", code))
+                .retrieve()
+                .body(new ParameterizedTypeReference<>() {});
+        if (response == null) {
+            throw new WxApiException(500, "获取微信手机号失败：微信接口无响应");
+        }
+
+        Number errcode = (Number) response.get("errcode");
+        if (errcode.intValue() != 0) {
+            String errmsg = (String) response.get("errmsg");
+            log.info("获取微信手机号失败：errcode: {}, errmsg: {}", errcode, errmsg);
+            throw new WxApiException(500, "获取微信手机号失败：" + errmsg);
+        }
+
+        Map<String, Object> phoneInfo = (Map<String, Object>) response.get("phone_info");
+        return (String) phoneInfo.get("phoneNumber");
     }
 }

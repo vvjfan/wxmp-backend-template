@@ -94,9 +94,9 @@ public class FaceVerificationService {
 
         if (response == null) {
             record.setStatus("FAILED");
-            record.setErrorMsg("微信返回空响应");
+            record.setErrorMsg("微信接口无响应");
             faceVerificationRepository.save(record);
-            throw new WxApiException(500, "获取 verifyId 失败：微信返回空响应");
+            throw new WxApiException(500, "获取 verifyId 失败：微信接口无响应");
         }
 
         Number errcode = (Number) response.get("errcode");
@@ -152,7 +152,7 @@ public class FaceVerificationService {
                 .body(new ParameterizedTypeReference<>() {});
 
         if (response == null) {
-            throw new WxApiException(500, "查询核身结果失败：微信返回空响应");
+            throw new WxApiException(500, "查询核身结果失败：微信接口无响应");
         }
 
         Number errcode = (Number) response.get("errcode");
